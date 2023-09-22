@@ -28,4 +28,6 @@ class MenuItem(models.Model):
 class orders(models.Model):
     username = models.CharField(max_length=255)
     items_quantity=models.JSONField()
+    order_status = models.SmallIntegerField(default=0)
+    delivery_crew = models.CharField(max_length=255,default="")
     

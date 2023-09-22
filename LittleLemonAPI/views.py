@@ -251,6 +251,7 @@ def orders_view(request):
         if request.method=="POST":
             request.data.update({"username": request.user.username})
             serialized_item=OrdersSerializer(data=request.data)
+            
             serialized_item.is_valid(raise_exception=True)
             serialized_item.save()
             return Response(serialized_item.data, status.HTTP_201_CREATED)
@@ -261,3 +262,49 @@ def orders_view(request):
 
 
             return Response(serialized_item.data,status.HTTP_200_OK)
+@api_view(["GET", "PUT", "PATCH", "DELETE"])
+def orders_id_view(request,id):
+            
+            items=orders.objects.filter(id=id)
+            serialized_item = OrdersSerializer(items,many=True)
+        
+            if request.user.groups.filter(name='Manager').exists():
+                if request.method == "GET":
+                    return Response(serialized_item.data)
+                if request.method == "PUT" or request.method == "PATCH":
+                    items.update(delivery_crew=request.data["delivery_crew"],
+                                 order_status=request.data["order_status"])
+                    return Response(serialized_item.data)
+                if request.method == "DELETE":
+                    
+                    order_to_remove = orders.objects.get(id=id)
+            
+                    order_to_remove.delete()
+                    #group = Group.objects.get(name="Delivery crew")
+                    #group.user_set.remove(new_crew)
+            
+                    
+                    return Response({"message":"Deleted!"},status.HTTP_200_OK)
+
+            elif request.user.groups.filter(name='Delivery crew').exists():
+                if request.method == "PATCH" or request.method == "PUT":
+                    #request.data.update({"id": id})
+                
+                    items.update(delivery_crew=request.data["delivery_crew"],
+                                 order_status=request.data["order_status"])
+                    #items.update()
+                    
+                    return Response({"message":"Updated!"},status.HTTP_200_OK)
+
+                else:
+                    return Response({"message":"You Are Not Authorized!"},status.HTTP_403_FORBIDDEN)
+
+
+            else:
+                if request.user.username!=items.values("username").get()['username']:
+                    print(items.values("username").get()['username'])
+                    
+                    return Response({"message":"You Are Not Authorized!"},status.HTTP_403_FORBIDDEN)
+            
+            
+            return Response(serialized_item.data)

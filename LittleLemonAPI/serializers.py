@@ -117,4 +117,4 @@ class CurrentUserSerializer(serializers.ModelSerializer):
 class OrdersSerializer(serializers.ModelSerializer):
     class Meta:
         model = orders
-        fields= ["username","items_quantity"]
+        fields= ["username","items_quantity","delivery_crew","order_status"]

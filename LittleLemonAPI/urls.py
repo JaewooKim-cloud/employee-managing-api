@@ -18,5 +18,6 @@ urlpatterns = [
     path('groups/delivery-crew/users',views.delivery_crew_edit),
     path('groups/delivery-crew/users/<int:id>',views.delivery_crew_delete),
     path('orders/',views.orders_view),
+    path('orders/<int:id>',views.orders_id_view),
 
 ]
